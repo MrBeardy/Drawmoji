@@ -1,6 +1,6 @@
 {
   "name": "drawmoji",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "scripts": {
     "start": "webpack-dev-server --port 3000",
     "build": "webpack -p"
