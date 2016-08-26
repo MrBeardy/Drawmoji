@@ -1,3 +1,8 @@
+import _ from 'lodash';
+import LZString from 'lz-string';
+
+import Row from './Row.jsx'
+import Pixel from './Pixel.jsx'
 
 export default class Pixels {
   constructor(data) {
