@@ -5,75 +5,9 @@ import { Router, Route, IndexRoute, hashHistory } from 'react-router';
 import _ from 'lodash';
 import LZString from 'lz-string';
 
-// import Layout from '../containers/Layout.jsx';
-// import Workspace from '../containers/Workspace.jsx';
-
-class Pixels {
-  constructor(data) {
-    if (_.isObject(data)) {
-      _.each(data, (pixels, y) => this[y] = new Row(pixels))
-    }
-  }
-
-  addAt(x, y, value) {
-    if (y >= 0 && x >= 0) {
-      if (!this[y]) this[y] = new Row();
-
-      this[y][x] = new Pixel(value);
-    }
-
-    return this;
-  }
-  deleteAt(x, y) {
-    if (this[y]) {
-      // If we're deleting the last pixel, delete the entire row
-      if (this[y].size == 0) {
-        delete this[y]
-      } else {
-        delete this[y][x];
-      }
-    }
-
-    return this;
-  }
-  each(callback) {
-    _.each(this, (row, y) => {
-      _.each(row, (pixel, x) => {
-        callback(x, y, pixel);
-      })
-    })
-  }
-
-  get size() {
-    return _.size(this)
-  }
-  get compressed() {
-    return LZString.compress(JSON.stringify(this));
-  }
-}
-class Row {
-  constructor(pixels) {
-    if (pixels) _.each(pixels, (value, x) => this[x] = new Pixel(value))
-  }
-  get size() {
-    return _.size(this)
-  }
-  get emojiString() {
-  }
-}
-class Pixel {
-  constructor(value) {
-    this.value = value;
-  }
-
-  get color() {
-    return this.value
-  }
-
-  toJSON() {
-    return this.value;
-  }
-}
+import Pixels from './components/Pixels.jsx'
+import Row from './components/Row.jsx'
+import Pixel from './components/Pixel.jsx'
 
 console.clear();
 
