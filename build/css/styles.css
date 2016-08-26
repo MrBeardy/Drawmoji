@@ -1,0 +1,25 @@
+body {
+  box-sizing: border-box;
+  background-color: #eee;
+}
+.inc-dec {
+  display: block;
+  padding: 5px 0;
+
+}
+#app {
+  font-family: arial;
+  width: 100%;
+  padding: 10px;
+}
+#drawmoji-canvas {
+  border: 1px solid black;
+  display: block;
+  margin: 10px 0;
+}
+
+#emojistring {
+  display: block;
+  width: 300px;
+  height: 200px;
+}
