@@ -1,9 +1,7 @@
 body {
-  margin: 0;
   box-sizing: border-box;
-  padding: 10px;
+  background-color: #eee;
 }
-
 .inc-dec {
   display: block;
   padding: 5px 0;
@@ -12,7 +10,7 @@ body {
 #app {
   font-family: arial;
   width: 100%;
-
+  padding: 10px;
 }
 #drawmoji-canvas {
   border: 1px solid black;

@@ -14,9 +14,10 @@ var WebpackPlugins = [
 ]
 
 module.exports = {
+  devtool: 'source-map',
   entry: [
     'babel-polyfill',
-    './app/index.js'
+    './app/index.jsx'
   ],
   output: {
     path: __dirname + '/build',
@@ -24,7 +25,7 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\/.js$/, exclude: /node_modules/, loader: "babel-loader" }
+      { test: /\.jsx$/, exclude: /node_modules/, loader: "babel-loader" }
     ]
   },
   plugins: WebpackPlugins
