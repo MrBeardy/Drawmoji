@@ -1,5 +1,12 @@
 ## Changelog
 
+### 1.5
+The big milestone for this release is that all of the code was moved off of Codepen for this version and uses Webpack.
+
+* Move all code locally and implement various build tools. :cake:
+* Add gh-pages branch to enable Github Pages.
+* Start work to split out components into stand-alone files.
+
 ### 1.4
  * Add LZString library for string compression.
  * Add constructor options for Pixels and Row classes to accept constructor data.
