@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import Pixel from './Pixel.jsx'
 
 export default class Row {

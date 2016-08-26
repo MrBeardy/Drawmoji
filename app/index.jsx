@@ -6,8 +6,6 @@ import _ from 'lodash';
 import LZString from 'lz-string';
 
 import Pixels from './components/Pixels.jsx'
-import Row from './components/Row.jsx'
-import Pixel from './components/Pixel.jsx'
 
 console.clear();
 
@@ -281,7 +279,7 @@ class Drawboard extends React.Component {
 }
 
 ReactDOM.render(
-  <Router>
+  <Router history={ hashHistory }>
     <Route path="/" component={Layout}>
       <IndexRoute component={Workspace} />
     </Route>
