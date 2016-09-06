@@ -1,4 +1,3 @@
-
 // Utils
 import _ from 'lodash';
 import LZString from 'lz-string';

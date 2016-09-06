@@ -7,8 +7,9 @@ import LZString from 'lz-string';
 import React from 'react';
 
 // App
+import data   from '../data'
 import Pixels from '../components/Pixels.jsx'
-import data from '../data'
+import GGrid  from '../components/graphics/GGrid.jsx'
 
 export default class Drawboard extends React.Component {
   static defaultProps = {
@@ -16,11 +17,13 @@ export default class Drawboard extends React.Component {
     cols: 30,
     rows: 15
   };
+
   static propTypes = {
     pixelSize: React.PropTypes.number,
     cols: React.PropTypes.number,
     rows: React.PropTypes.number
   };
+
   state = {
     gridColor: '#ccc',
     colors: ['#cc0000', '#00cc00', '#0000cc'],
@@ -30,100 +33,29 @@ export default class Drawboard extends React.Component {
     emojiString: '',
     sizInfo: '',
   };
+
   constructor(props) {
     super(props)
 
     this.ctx = {};
+    this.graphics = {};
     this.mouseButton = -1;
     this.mouseDown = false;
     this.lastPixel = "";
   }
-  componentDidMount() {
-    this.refs.canvas.addEventListener('contextmenu', this.canvasContextMenu.bind(this), false);
-    this.refs.canvas.addEventListener('mousedown', this.canvasClick.bind(this));
-    this.refs.canvas.addEventListener('mouseup', this.canvasClick.bind(this));
-    this.refs.canvas.addEventListener('mousemove', this.canvasMouseMove.bind(this));
 
-    this.setState({
-      pixels: this.loadPixels()
-    })
+  get canvasWidth() { return this.refs.canvas.width }
+  get canvasHeight() { return this.refs.canvas.height }
 
-    this.setupContext();
-    this.repaint();
-  }
-  componentDidUpdate() {
-    this.repaint();
-  }
-  setupContext() {
-    this.ctx = this.refs.canvas.getContext('2d');
-  }
-  repaint() {
-    this.clear()
-    this.paint()
-  }
-  clear() {
-    this.ctx.clearRect(0, 0, this.canvasWidth(), this.canvasHeight());
-  }
-  paint() {
-    this.drawLines();
+  get canvasComputedWidth() { return this.props.pixelSize * this.props.cols }
+  get canvasComputedHeight() { return this.props.pixelSize * this.props.rows }
 
-    if (this.state.pixels) this.drawPixels();
-  }
-  drawPixels() {
-    let pixelSize = this.props.pixelSize;
-
-    this.state.pixels.each((x, y, pixel) => this.drawPixel(x, y, pixel.color))
-  }
-  drawGhostPixel(x, y) {
-    let pixelSize = this.props.pixelSize;
-
-    this.ctx.beginPath()
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
-    this.ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-  }
-  drawPixel(x, y, colorId) {
-    let pixelSize = this.props.pixelSize;
-
-    this.ctx.beginPath()
-    this.ctx.fillStyle = this.state.colors[colorId];
-    this.ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-  }
-  drawLines() {
-    let cols = this.props.cols;
-    let rows = this.props.rows;
-    let pixelSize = this.props.pixelSize;
-
-    let width = this.canvasWidth();
-    let height = this.canvasHeight();
-
-    this.ctx.beginPath();
-
-    // Columns
-    for (let c = pixelSize; c < width; c += pixelSize) {
-      this.ctx.moveTo(c, 0);
-      this.ctx.lineTo(c, height);
-    }
-
-    // Rows
-    for (let r = pixelSize; r < height; r += pixelSize) {
-      this.ctx.moveTo(0, r);
-      this.ctx.lineTo(width, r);
-    }
-
-    this.ctx.strokeStyle = this.state.gridColor;
-    this.ctx.stroke();
-  }
-  canvasWidth() {
-    return this.props.pixelSize * this.props.cols
-  }
-  canvasHeight() {
-    return this.props.pixelSize * this.props.rows
-  }
   canvasContextMenu(e) {
     if (!e.ctrlKey) {
       e.preventDefault();
     }
   }
+
   canvasClick(e) {
     if (e.button == 2 && e.ctrlKey) return;
 
@@ -132,9 +64,11 @@ export default class Drawboard extends React.Component {
 
     this.canvasMouseEventAlterPixels(e);
   }
+
   canvasMouseMove(e) {
     this.canvasMouseEventAlterPixels(e);
   }
+
   canvasMouseEventAlterPixels(e) {
     let pixelSize = this.props.pixelSize;
     let color = this.state.currentColor;
@@ -166,15 +100,84 @@ export default class Drawboard extends React.Component {
     this.repaint();
     this.drawGhostPixel(x, y)
   }
+
+  componentDidMount() {
+    this.refs.canvas.addEventListener('contextmenu', this.canvasContextMenu.bind(this), false);
+    this.refs.canvas.addEventListener('mousedown', this.canvasClick.bind(this));
+    this.refs.canvas.addEventListener('mouseup', this.canvasClick.bind(this));
+    this.refs.canvas.addEventListener('mousemove', this.canvasMouseMove.bind(this));
+
+    this.setState({
+      pixels: this.loadPixels()
+    })
+
+    this.setupContext();
+    this.setupGraphics();
+    this.repaint();
+  }
+
+  componentDidUpdate() {
+    this.repaint();
+  }
+
+  setupContext() {
+    this.ctx = this.refs.canvas.getContext('2d');
+  }
+
+  setupGraphics() {
+    this.graphics['grid'] = new GGrid(this.ctx, this);
+    this.graphics.grid.paint();
+  }
+
+  repaint() {
+    this.clear()
+    this.paint()
+  }
+
+  clear() {
+    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+  }
+
+  paint() {
+    _.each(this.graphics, (graphic) => graphic.paint());
+
+    if (this.state.pixels) this.drawPixels();
+  }
+
+  drawPixels() {
+    let pixelSize = this.props.pixelSize;
+
+    this.state.pixels.each((x, y, pixel) => this.drawPixel(x, y, pixel.color))
+  }
+
+  drawGhostPixel(x, y) {
+    let pixelSize = this.props.pixelSize;
+
+    this.ctx.beginPath()
+    this.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    this.ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+  }
+
+  drawPixel(x, y, colorId) {
+    let pixelSize = this.props.pixelSize;
+
+    this.ctx.beginPath()
+    this.ctx.fillStyle = this.state.colors[colorId];
+    this.ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+  }
+
   addPixel(x, y, value) {
     this.setState({ pixels: this.state.pixels.addAt(x, y, value) })
   }
+
   deletePixel(x, y) {
     this.setState({ pixels: this.state.pixels.deleteAt(x, y) })
   }
+
   storePixels() {
     store.set(data.STORAGE_PREFIX + "pixels", this.state.pixels.compressed);
   }
+
   loadPixels() {
     var storedPixels = store.get(data.STORAGE_PREFIX + "pixels")
     var pixels;
@@ -187,13 +190,16 @@ export default class Drawboard extends React.Component {
 
     return pixels;
   }
+
   render() {
     return (
       <div>
         <div onClick={ () => this.setState({currentColor: 0}) } className="ui red button"> red</div>
         <div onClick={ () => this.setState({currentColor: 1}) } className="ui green button"> green</div>
         <div onClick={ () => this.setState({currentColor: 2}) } className="ui blue button"> blue</div>
-        <canvas ref='canvas' id='drawmoji-canvas' width={ this.canvasWidth() } height={ this.canvasHeight() }/>
+
+        <canvas ref='canvas' id='drawmoji-canvas' width={ this.canvasComputedWidth } height={ this.canvasComputedHeight }/>
+
         <div onClick={ this.storePixels.bind(this) } className="ui pink button"> Save</div> { this.state.sizeInfo }
       </div>
     )
