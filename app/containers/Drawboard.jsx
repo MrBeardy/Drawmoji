@@ -10,6 +10,8 @@ import React from 'react';
 import data   from '../data'
 import Pixels from '../components/Pixels.jsx'
 import GGrid  from '../components/graphics/GGrid.jsx'
+import GPixel from '../components/graphics/GPixel.jsx'
+import GPixels from '../components/graphics/GPixels.jsx'
 
 export default class Drawboard extends React.Component {
   static defaultProps = {
@@ -96,7 +98,6 @@ export default class Drawboard extends React.Component {
       })
     }
 
-    // Comment out this repaint for a cool ghosting effect
     this.repaint();
     this.drawGhostPixel(x, y)
   }
@@ -125,8 +126,8 @@ export default class Drawboard extends React.Component {
   }
 
   setupGraphics() {
-    this.graphics['grid'] = new GGrid(this.ctx, this);
-    this.graphics.grid.paint();
+    this.graphics.grid = new GGrid(this.ctx, this);
+    this.graphics.pixels = new GPixels(this.ctx, this);
   }
 
   repaint() {
@@ -144,26 +145,28 @@ export default class Drawboard extends React.Component {
     if (this.state.pixels) this.drawPixels();
   }
 
+  drawGhostPixel(x, y) {
+    return new GPixel(this.ctx, this, {
+      x: x,
+      y: y,
+      color: "rgba(0, 0, 0, 0.3)"
+    }).paint()
+  }
+
   drawPixels() {
     let pixelSize = this.props.pixelSize;
 
     this.state.pixels.each((x, y, pixel) => this.drawPixel(x, y, pixel.color))
   }
 
-  drawGhostPixel(x, y) {
-    let pixelSize = this.props.pixelSize;
-
-    this.ctx.beginPath()
-    this.ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
-    this.ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-  }
-
   drawPixel(x, y, colorId) {
-    let pixelSize = this.props.pixelSize;
+    let color = this.state.colors[colorId]
 
-    this.ctx.beginPath()
-    this.ctx.fillStyle = this.state.colors[colorId];
-    this.ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+    return new GPixel(this.ctx, this, {
+      x: x,
+      y: y,
+      color: color
+    }).paint()
   }
 
   addPixel(x, y, value) {
